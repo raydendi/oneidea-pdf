@@ -1,0 +1,27 @@
+#!/bin/sh
+NAME_FILE=$1
+# Kata Kunci
+pdfgrep --page-range 1 -i 'Kata Kunci|KATA KUNCI' $NAME_FILE \
+||pdfgrep --page-range 1 -i 'Keywords|KEYWORDS' $NAME_FILE | xargs;\
+# Abstrak or Abstract
+echo -e '\n\033[31mAbstrak\033[0m'&&
+RESULT=$( pdfgrep --page-range 1 -ioc "Abstrak" "$NAME_FILE" )
+
+if [[ $RESULT -ge 1 ]];	then 
+# find Abstrak if pdf is Indonesia 
+pdfgrep --page-range 1 -iA 30 'Abstrak|ABSTRAK' $NAME_FILE|awk '(/ABSTRAK/)||(/Abstrak/){flag=1;next}(/KATA KUNCI/)||(/ABSTRACT/)||(/Kata Kunci/)||(/Keywords/)||(/LATAR BELAKANG/)||(/Latar Belakang/)||(/Pendahuluan/)||(/PENDAHULUAN/)||(/Introduction/)||(/INTRODUCTION/)||(/KEYWORDS/){flag=0}flag'|xargs
+else 
+# find Abstrak if pdf is English
+pdfgrep --page-range 1  -iA 30 'ABSTRACT|Abstract' $NAME_FILE|awk '(/ABSTRACT/)||(/Abstract/){flag=1;next}(/LATAR BELAKANG/)||(/Latar Belakang/)||(/Pendahuluan/)||(/PENDAHULUAN/)||(/Introduction/)||(/INTRODUCTION/)||(/Keywords/)||(/KEYWORDS/){flag=0}flag'|xargs
+fi 
+
+# Kesimpulan or Conclusion
+echo -e '\n\033[31mKesimpulan\033[0m'&&\
+	pdfgrep -iA 30 'Kesimpulan|Conclusion|PENUTUP|Simpulan' $NAME_FILE | awk '(/Kesimpulan$/)||(/^Conclusion$/)||(/PENUTUP/)||(/^Penutup$/)||(/Simpulan/)||(/SIMPULAN/){flag=1;next}(/^Saran$/)||(/DAFTAR PUSTAKA/)||(/Daftar Pustaka/){flag=0}flag'|xargs&&\
+
+# Search through database for theories (Model_theory.txt) 
+echo -e '\n\033[31mTeori\033[0m'; pdfgrep -iof model_theory.txt $NAME_FILE | xargs 
+
+
+#Find Judul
+#pdfgrep --page-range 1  -i  -B 10 'Abstrak|Abstract' $NAME_FILE| awk '(/Journal/){flag=1;next}(/ABSTRACT/)||(/Abstrak/)||(/ABSTRAK/){flag=0}flag'||xargs&&\
