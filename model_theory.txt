@@ -1,0 +1,12 @@
+Thomas Aquinas|Plato|Aristoteles|Teori Hukum Alam Klasik|Hukum Alam
+Alf Ross|John Locke|Teori Hukum Alam Kontemporer
+Friederich Stahl|Teori Theokrasi|Teori Teokrasi
+JJ Rousseau|Jean-Jacques Rousseau|Teori Perjanjian Masyarakat|Teori Kedaulatan Rakyat
+Hans Kelsen|Teori Hukum Murni|Hukum Murni
+Aristoteles| Plato|John Rawls|Teori Keadilan|Keadilan Distributif|Keadilan Komunikatif
+John Stuart Mill|Jeremy Bentham|Teori Utiliarian|Utilitarianism
+Mochtar Kusumaatmadja|Teori Hukum Pembangunan|Hukum Pembangunan
+Satjipto Rahardjo|Teori Hukum Progresif|Hukum Progresif
+Teori Kedaulatan Negara|Kedaulatan Negara
+John Austin|H.L.A Hart|Teori Positivisme
+Roscoe Pound|Law as Tool of Social Enginering|Hukum sebagai sarana untuk memperbaharui masyarakat|Hukum sebagai alat untuk memperbaharui masyarakat|Hukum sebagai sarana untuk merekayasa masyarakat|Hukum sebagai alat untuk merekayasa masyarakat
