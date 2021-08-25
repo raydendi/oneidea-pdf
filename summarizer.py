@@ -11,7 +11,7 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 text = str(sys.stdin.read())   
 # Tokenizing the text
 
-stopWords = set(stopwords.words("english"))
+stopWords = set(stopwords.words("indonesian"))
 words = word_tokenize(text)
    
 # Creating a frequency table to keep the 
@@ -56,6 +56,4 @@ for sentence in sentences:
     if (sentence in sentenceValue) and (sentenceValue[sentence] > (1.2 * average)):
         summary += " " + sentence
 print(summary)
-
-
 
