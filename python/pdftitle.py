@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# pylint: disable=missing-module-docstring
-# pylint: disable=missing-function-docstring
-# pylint: disable=missing-class-docstring
-# pylint: disable=invalid-name
 import sys
 import argparse
 import traceback
@@ -732,4 +727,3 @@ def run():
 
 if __name__ == '__main__':
     sys.exit(run())
-

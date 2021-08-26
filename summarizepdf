@@ -1,38 +1,47 @@
 #!/bin/bash
-#NAME_FILE="$1"
 
-for NAME_FILE in "$@"; do 
-#ReplaceName () {
-#FINDSPACE=$( find "$INPUTNAME" -name "\ " | wc -l ) 
-#if [[ "$FINDSPACE" -gt 0 ]];
-#then 
-#echo "Harap masukan input file dengan benar"
-#else
-#echo "$INPUTNAME"
-#fi
-#}
+this_dir="$( dirname "$0")"
+titleSearch="$this_dir/python/pdftitle.py"
+summarize="$this_dir/python/summarizer.py"
+teoriSearch="$this_dir/word/model_theory.txt"
 
-#NAME_FILE="$( ReplaceName )"
+read -p "Summarize it? [Y,n]: " input 
+# take one or multiple input file to the variable NAME_FILE
 
+# Title of PDF
+Title () {
+
+echo -e '\n***'
+if [[ $( python3 "$titleSearch" -p "$NAME_FILE") == "" ]]; 
+then
+echo -e "$NAME_FILE"
+else 
+echo -e "$( python3 "$titleSearch" -p "$NAME_FILE" )"
+fi
+}
+
+# Result 
 Result () {
+
 ISJURNAL=$( pdfgrep --page-range 1 -ioc "Abstrak|Abstract|Kesimpulan|Conclusion|Penutup|Simpulan" "$NAME_FILE"  )
 ISABSTRAK=$( pdfgrep --page-range 1 -ioc "Abstrak" "$NAME_FILE" )
 ABSTRAK=$(pdfgrep --page-range 1 -iA 30 'Abstrak|ABSTRAK' "$NAME_FILE" |awk '(/ABSTRAK/)||(/Abstrak/){flag=1;next}(/KATA KUNCI/)||(/ABSTRACT/)||(/Kata Kunci/)||(/Keywords/)||(/LATAR BELAKANG/)||(/Latar Belakang/)||(/Pendahuluan/)||(/PENDAHULUAN/)||(/Introduction/)||(/INTRODUCTION/)||(/KEYWORDS/){flag=0}flag'|xargs)
 ABSTRACT=$(pdfgrep --page-range 1  -iA 30 'ABSTRACT|Abstract' "$NAME_FILE" |awk '(/ABSTRACT/)||(/Abstract/){flag=1;next}(/LATAR BELAKANG/)||(/Latar Belakang/)||(/Pendahuluan/)||(/PENDAHULUAN/)||(/Introduction/)||(/INTRODUCTION/)||(/Keywords/)||(/KEYWORDS/){flag=0}flag'|xargs)
 KESIMPULAN=$(pdfgrep -iA 30 'Kesimpulan|Conclusion|PENUTUP|Simpulan' "$NAME_FILE" | awk '(/Kesimpulan$/)||(/^Conclusion$/)||(/PENUTUP/)||(/^Penutup$/)||(/Simpulan/)||(/SIMPULAN/){flag=1;next}(/^Saran$/)||(/DAFTAR PUSTAKA/)||(/Daftar Pustaka/){flag=0}flag'|xargs)
 KATAKUNCI=$(pdfgrep --page-range 1 -i 'Kata Kunci|KATA KUNCI' "$NAME_FILE" || pdfgrep --page-range 1 -i 'Keywords|KEYWORDS' "$NAME_FILE" | xargs)
-TEORI=$( pdfgrep -iof model_theory.txt "$NAME_FILE" )
+TEORI=$( pdfgrep -iof "$teoriSearch" "$NAME_FILE" )
 ETC=$( pdfgrep -iA 50 'Mengadili|Kesimpulan|Conclusion|Preface|Abstraksi|Menimbang' "$NAME_FILE" | xargs )
 
-#  JENIS JURNAL! 
+
+#  Asking for if the type is JOURNAL! 
 if [[ $ISJURNAL -ge 1 ]];
 then
-read -p "Perlu dirangkum? [Y,n]: " input 
+
+
 if [[ $input ==  "n" || $input == "N" ]] ; 
 then
 
-# kalau tidak perlu dirangkum tidak dimasukin ke summarizertext.py 
-
+# Summarize text 
 if [[ $ISABSTRAK -ge 1 ]];	
 then 
 # find Abstrak if pdf is Indonesia 
@@ -42,13 +51,13 @@ echo -e '\n\033[31mKesimpulan\033[0m'&&\
 echo "$KESIMPULAN" ;
 else 
 # find Abstrak if pdf is English
-echo -e '\n\033[31mAbstrak:\033[0m'&&
+echo -e '\n\033[31mAbstract:\033[0m'&&
 echo "$ABSTRACT"
-echo -e '\033[31mKesimpulan:\033[0m'&&\
+echo -e '\033[31mConclusion:\033[0m'&&\
 echo "$KESIMPULAN" ;
 fi 
 echo "$KATAKUNCI" ;
-echo -e '\n\033[31mTeori:\033[0m';
+echo -e '\n\033[31mTheory:\033[0m';
 echo "$TEORI" | sort -uk2 -f | sort -nk1 | xargs
 
 
@@ -57,18 +66,18 @@ echo "$TEORI" | sort -uk2 -f | sort -nk1 | xargs
 elif [[ $input == "Y" || $input == "y" ]] ;
 then
 
-echo -e '\n\033[31mRingkasan:\033[0m'&&
+echo -e '\n\033[31mSummary:\033[0m'&&
 
 if [[ $ISABSTRAK -ge 1 ]];	
 then 
-echo "$ABSTRAK $KESIMPULAN" | python3 ~/funProject/summarize-pdf/summarizer.py | xargs ;
+echo "$ABSTRAK $KESIMPULAN" | python3 "$summarize" | xargs ;
 else 
-echo "$ABSTRACT $KESIMPULAN" | python3 ~/funProject/summarize-pdf/summarizer.py | xargs ;
+echo "$ABSTRACT $KESIMPULAN" | python3 "$summarize" | xargs ;
 
 fi 
 
 echo "$KATAKUNCI" ;
-echo -e '\n\033[31mTeori:\033[0m';
+echo -e '\n\033[31mTheory:\033[0m';
 echo "$TEORI" | sort -uk2 -f | sort -nk1 | xargs
 # if the ouput either y or n 
 else 
@@ -77,11 +86,13 @@ fi
 
 # JENIS SELAIN JURNAL 
 else
-echo -e '\n\033[31mRingkasan:\033[0m'&&
-echo -e "$ETC" | python3 ~/funProject/summarize-pdf/summarizer.py | xargs ;
+echo -e '\n\033[31mSummary:\033[0m'&&
+echo -e "$ETC" | python3 "$summarize" | xargs ;
 #	echo "$ABSTRACT $KESIMPULAN" | python3 summarizer.py ;
 fi
 }
+for NAME_FILE in "$@"; do 
+Title
 Result
-done 
 
+done
