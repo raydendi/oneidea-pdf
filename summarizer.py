@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # coding: utf-8
-
-# importing libraries
 import nltk
 import sys
 from nltk.corpus import stopwords
@@ -47,13 +45,16 @@ for sentence in sentenceValue:
     sumValues += sentenceValue[sentence]
    
 # Average value of a sentence from the original text
-   
-average = int(sumValues / len(sentenceValue))
-   
+
+if len(sentenceValue) == 0:
+    print("Maaf tidak dapat menemukan apapun")
+else:
+    average = int(sumValues / len(sentenceValue))
+
+
 # Storing sentences into our summary.
 summary = ''
 for sentence in sentences:
     if (sentence in sentenceValue) and (sentenceValue[sentence] > (1.2 * average)):
         summary += " " + sentence
 print(summary)
-
