@@ -1,42 +1,51 @@
 #!/bin/bash
-
 this_dir="$( dirname "$0")"
 titleSearch="$this_dir/python/pdftitle.py"
 summarize="$this_dir/python/summarizer.py"
 teoriSearch="$this_dir/word/model_theory.txt"
+methodSearch="$this_dir/word/methods.txt"
 
 read -p "Summarize it? [Y,n]: " input 
 # take one or multiple input file to the variable NAME_FILE
 
 # Title of PDF
 Title () {
+echo -e "\n*** file: $NAME_FILE"
 
-echo -e '\n***'
 if [[ $( python3 "$titleSearch" -p "$NAME_FILE") == "" ]]; 
 then
 echo -e "$NAME_FILE"
 else 
-echo -e "$( python3 "$titleSearch" -p "$NAME_FILE" )"
+echo -e "$( python3 "$titleSearch" -p "$NAME_FILE" )"  
 fi
 }
 
 # Result 
 Result () {
 
+# var for if else statement 
 ISJURNAL=$( pdfgrep --page-range 1 -ioc "Abstrak|Abstract|Kesimpulan|Conclusion|Penutup|Simpulan" "$NAME_FILE"  )
 ISABSTRAK=$( pdfgrep --page-range 1 -ioc "Abstrak" "$NAME_FILE" )
-ABSTRAK=$(pdfgrep --page-range 1 -iA 30 'Abstrak|ABSTRAK' "$NAME_FILE" |awk '(/ABSTRAK/)||(/Abstrak/){flag=1;next}(/KATA KUNCI/)||(/ABSTRACT/)||(/Kata Kunci/)||(/Keywords/)||(/LATAR BELAKANG/)||(/Latar Belakang/)||(/Pendahuluan/)||(/PENDAHULUAN/)||(/Introduction/)||(/INTRODUCTION/)||(/KEYWORDS/){flag=0}flag'|xargs)
+
+# initialize variable arguments
+ABSTRAK=$(pdfgrep --page-range 1 -iA 30 'Abstrak|ABSTRAK' "$NAME_FILE" |awk '(/ABSTRAK/)||(/Abstrak/){flag=1;next}(/KATA KUNCI/)||(/ABSTRACT/)||(/Kata Kunci/)||(/Keywords/)||(/LATAR BELAKANG/)||(/Latar Belakang/)||(/Pendahuluan/)||(/PENDAHULUAN/)||(/Introduction/)||(/INTRODUCTION/)||(/KEYWORDS/){flag=0}flag'| xargs )
 ABSTRACT=$(pdfgrep --page-range 1  -iA 30 'ABSTRACT|Abstract' "$NAME_FILE" |awk '(/ABSTRACT/)||(/Abstract/){flag=1;next}(/LATAR BELAKANG/)||(/Latar Belakang/)||(/Pendahuluan/)||(/PENDAHULUAN/)||(/Introduction/)||(/INTRODUCTION/)||(/Keywords/)||(/KEYWORDS/){flag=0}flag'|xargs)
 KESIMPULAN=$(pdfgrep -iA 30 'Kesimpulan|Conclusion|PENUTUP|Simpulan' "$NAME_FILE" | awk '(/Kesimpulan$/)||(/^Conclusion$/)||(/PENUTUP/)||(/^Penutup$/)||(/Simpulan/)||(/SIMPULAN/){flag=1;next}(/^Saran$/)||(/DAFTAR PUSTAKA/)||(/Daftar Pustaka/){flag=0}flag'|xargs)
 KATAKUNCI=$(pdfgrep --page-range 1 -i 'Kata Kunci|KATA KUNCI' "$NAME_FILE" || pdfgrep --page-range 1 -i 'Keywords|KEYWORDS' "$NAME_FILE" | xargs)
 TEORI=$( pdfgrep -iof "$teoriSearch" "$NAME_FILE" )
+METHOD=$( pdfgrep -iof "$methodSearch" "$NAME_FILE" )
 ETC=$( pdfgrep -iA 50 'Mengadili|Kesimpulan|Conclusion|Preface|Abstraksi|Menimbang' "$NAME_FILE" | xargs )
+
+
+# var for summary
+SUMMARYETC=$( echo -e "$ETC" | python3 "$summarize" | xargs )
+SUMMARYID=$( echo "$ABSTRAK $KESIMPULAN" | python3 "$summarize" | xargs )
+SUMMARYEN=$( echo "$ABSTRACT $KESIMPULAN" | python3 "$summarize" | xargs  )
 
 
 #  Asking for if the type is JOURNAL! 
 if [[ $ISJURNAL -ge 1 ]];
 then
-
 
 if [[ $input ==  "n" || $input == "N" ]] ; 
 then
@@ -49,6 +58,7 @@ echo -e '\033[31mAbstrak:\033[0m'&&
 echo "$ABSTRAK" ;
 echo -e '\n\033[31mKesimpulan\033[0m'&&\
 echo "$KESIMPULAN" ;
+
 else 
 # find Abstrak if pdf is English
 echo -e '\n\033[31mAbstract:\033[0m'&&
@@ -56,43 +66,55 @@ echo "$ABSTRACT"
 echo -e '\033[31mConclusion:\033[0m'&&\
 echo "$KESIMPULAN" ;
 fi 
+
 echo "$KATAKUNCI" ;
+echo -e '\n\033[31mMethod:\033[0m'&&\
+echo "$METHOD" | sort -uk2 -f | sort -nk1 | xargs
 echo -e '\n\033[31mTheory:\033[0m';
 echo "$TEORI" | sort -uk2 -f | sort -nk1 | xargs
 
+# if user need to summarize
+elif [[ $input == "Y" || $input == "y" || $input == "" ]] ;
 
-
-# if perlu dirangkum 
-elif [[ $input == "Y" || $input == "y" ]] ;
 then
 
 echo -e '\n\033[31mSummary:\033[0m'&&
 
 if [[ $ISABSTRAK -ge 1 ]];	
 then 
-echo "$ABSTRAK $KESIMPULAN" | python3 "$summarize" | xargs ;
+echo -e "$SUMMARYID"
 else 
-echo "$ABSTRACT $KESIMPULAN" | python3 "$summarize" | xargs ;
-
+echo -e "$SUMMARYEN"
 fi 
-
 echo "$KATAKUNCI" ;
+echo -e '\n\033[31mMethod:\033[0m'&&\
+echo "$METHOD" | sort -uk2 -f | sort -nk1 | xargs
 echo -e '\n\033[31mTheory:\033[0m';
 echo "$TEORI" | sort -uk2 -f | sort -nk1 | xargs
+
+
 # if the ouput either y or n 
-else 
-echo "Harap masukan input dengan benar.."
+#else 
+#echo "Please take the right input.."
 fi
 
-# JENIS SELAIN JURNAL 
+# Summary the besides type of journal
 else
 echo -e '\n\033[31mSummary:\033[0m'&&
-echo -e "$ETC" | python3 "$summarize" | xargs ;
+echo -e "$SUMMARYETC" ;
 #	echo "$ABSTRACT $KESIMPULAN" | python3 summarizer.py ;
 fi
 }
+
+
+
+
+# iterate and execute the program
 for NAME_FILE in "$@"; do 
 Title
 Result
-
 done
+
+
+exit
+

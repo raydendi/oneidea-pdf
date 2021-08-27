@@ -47,7 +47,7 @@ for sentence in sentenceValue:
 # Average value of a sentence from the original text
 
 if len(sentenceValue) == 0:
-    print("Maaf tidak dapat menemukan apapun")
+    print("Sorry cant find any text")
 else:
     average = int(sumValues / len(sentenceValue))
 
