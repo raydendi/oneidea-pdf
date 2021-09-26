@@ -1,18 +1,18 @@
 #!/bin/bash  
-selected=`find -type f | fzf | sed 's/^..//g' | tr -d '\n'`
+
+selected=`find -type f -iname '*.pdf' | fzf | sed 's/^..//g' | tr -d '\n'`
 
 if [[ -z $selected ]]; then
     exit 0
 fi
 
-read -p "Find text: " query
+echo -e "\033[31m*** $selected\033[0m"
 
-if ls -f | grep -qs "$selected" ; then
-	#	selected=${selected// \\ //}
-	#selected=$( echo $selected | sed "s= =\\\ =g" )
-	#echo "$selected"
-	pdfgrep -iA 50 "$query" "$selected" | less -Q
-else
-     echo "found nothing"
-fi
-
+while [ true ]; do 
+	read -p "Find text: " query 
+	if find -type f -iname '*.pdf' | grep -qs "$selected" ; then
+		pdfgrep -iA 60 "$query" "$selected" | less -Q 
+	else
+    echo "found nothing" | less -Q
+	fi
+done
