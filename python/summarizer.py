@@ -11,10 +11,10 @@ text = str(sys.stdin.read())
 
 stopWords = set(stopwords.words("english"))
 words = word_tokenize(text)
-   
-# Creating a frequency table to keep the 
+  
+# Creating a frequency table to keep the
 # score of each word
-   
+  
 freqTable = dict()
 for word in words:
     word = word.lower()
@@ -28,8 +28,7 @@ for word in words:
 # Creating a dictionary to keep the score
 # of each sentence
 sentences = sent_tokenize(text)
-sentenceValue = dict()
-   
+sentenceValue = dict() 
 for sentence in sentences:
     for word, freq in freqTable.items():
         if word in sentence.lower():
@@ -37,9 +36,6 @@ for sentence in sentences:
                 sentenceValue[sentence] += freq
             else:
                 sentenceValue[sentence] = freq
-   
-   
-   
 sumValues = 0
 for sentence in sentenceValue:
     sumValues += sentenceValue[sentence]

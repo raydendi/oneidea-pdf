@@ -5,6 +5,7 @@ summarize="$this_dir/python/summarizer.py"
 teoriSearch="$this_dir/word/model_theory.txt"
 methodSearch="$this_dir/word/methods.txt"
 findtext="$this_dir/findpdftext.sh"
+findtextinfolder="$this_dir/findpdftextinfolder.sh"
 
 # take one or multiple input file to the variable NAME_FILE
 
@@ -98,7 +99,9 @@ fi
 for NAME_FILE in "$@"; do 
 	if [[ $NAME_FILE = "-f"  ]]; then
 		sh $findtext	
-	else
+	elif [[ $NAME_FILE = "-d" ]]; then
+		sh $findtextinfolder
+	else 
 		read -p "Summarize it? [Y,n]: " input 
 		Title
 		Result
