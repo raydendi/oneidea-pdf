@@ -11,7 +11,7 @@ echo -e "\033[31m*** $selected\033[0m"
 while [ true ]; do 
 	read -p "Find text: " query 
 	if find -type f -iname '*.pdf' | grep -qs "$selected" ; then
-		pdfgrep -iA 60 "$query" "$selected" | less -Q 
+		pdfgrep --color auto -iA 60 -B 30 "$query" "$selected" --cache --warn-empty -n| less --silent -I --use-color --incsearch -~ -s
 	else
     echo "found nothing" | less -Q
 	fi
